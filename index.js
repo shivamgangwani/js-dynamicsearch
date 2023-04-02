@@ -89,8 +89,12 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             "item_handler" : (row_element, result) => {
                 row_element.style.background = result.value;
+                let in_field = document.querySelector("input[name='color']");
                 row_element.firstChild.remove();
-                // row_element.querySelector("div:last-child").style.color = "rgba(0,0,0,0)";
+                row_element.addEventListener('click', () => in_field.value = result['color']);
+                row_element.addEventListener('mouseover', () =>  row_element.style.opacity = 0.8);
+                row_element.addEventListener('mouseout', () => row_element.style.opacity = 1);
+                row_element.querySelector("div:last-child").style.color = "rgba(0,0,0,0)";
                 return row_element;
             }
         }
@@ -182,6 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if(CURRENT_STYLE === "autosuggest") document.querySelector(".autosuggest_box").style.display = 'block';
     });
     document.querySelector("input[name='color']").addEventListener("focusout", () => {
-        if(CURRENT_STYLE === "autosuggest") document.querySelector(".autosuggest_box").style.display = 'none';
+        if(CURRENT_STYLE === "autosuggest") setTimeout( () => document.querySelector(".autosuggest_box").style.display = 'none', 50);
     });
 });

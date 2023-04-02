@@ -19,7 +19,3 @@
     padding: 5px 0px;
     text-transform: uppercase;
 }
-
-.autosuggest_box > div.row:hover {
-    opacity: 0.5;
-}
