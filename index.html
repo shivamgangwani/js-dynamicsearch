@@ -25,6 +25,7 @@
                 <a class='btn btn-primary switch_style' target_style="simple">Simple</a>
                 <a class='btn btn-primary switch_style' target_style="cards">Cards</a>
                 <a class='btn btn-primary switch_style' target_style="table">Table</a>
+                <a class='btn btn-primary switch_style' target_style="autosuggest">Autosuggest</a>
             </div>
             <div class="row mb-3">
                 <span>Total Colors: <span id="col_num"></span></span>
@@ -33,10 +34,9 @@
                 <label for="color" class="col-sm-2 col-form-label">WhichColor</label>
                 <div class="col-sm-10">
                   <input type="text" name="color" class="form-control">
+                  <div id="search_results" class="container p-5"></div>
                 </div>
               </div>
-
-            <div id="search_results" class="container p-5"></div>
             
         </main>
         <footer class="pt-5 my-5 text-muted border-top">

@@ -73,6 +73,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 'value' : (i, value) => noKeyOnlyValue("", value),
             },
             "item_handler" : (row_element, result) => row_element
+        },
+        "autosuggest" : {
+            "row_container" : {
+                "element" : "div",
+                "classes" : ["row"]
+            },
+            "field_container" : {
+                "element" : "div",
+                "classes" : ["col"]
+            },
+            "field_handlers" : {
+                "color" : (i, color) => noKeyOnlyValue("", color),
+                "value" : (i, value) => noKeyOnlyValue("", value),
+            },
+            "item_handler" : (row_element, result) => {
+                row_element.style.background = result.value;
+                row_element.firstChild.remove();
+                // row_element.querySelector("div:last-child").style.color = "rgba(0,0,0,0)";
+                return row_element;
+            }
         }
     }
 
@@ -84,7 +104,9 @@ document.addEventListener("DOMContentLoaded", () => {
         "field_container" : styles[DEFAULT_STYLE]['field_container']
     });
 
-    search.maxItems = 50;
+
+
+    search.maxItems = 10;
 
     search.itemHandler = styles[DEFAULT_STYLE]['item_handler'];
 
@@ -143,10 +165,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 search.resultContainer = new_search_container;
             }
         }
+
+        if(CURRENT_STYLE === "autosuggest" || new_style === "autosuggest") {
+            document.querySelector("#search_results").classList.toggle("p-5");
+            document.querySelector("#search_results").classList.toggle("autosuggest_box");
+        }
+
         search.renderSearchResults(search.filterExistingResult(search.resultCache));
     }
 
     document.querySelectorAll(".switch_style").forEach( (el) => {
         el.addEventListener('click', () => switchStyle(el.getAttribute("target_style")));
+    });
+
+    document.querySelector("input[name='color']").addEventListener("focusin", () => {
+        if(CURRENT_STYLE === "autosuggest") document.querySelector(".autosuggest_box").style.display = 'block';
+    });
+    document.querySelector("input[name='color']").addEventListener("focusout", () => {
+        if(CURRENT_STYLE === "autosuggest") document.querySelector(".autosuggest_box").style.display = 'none';
     });
 });
