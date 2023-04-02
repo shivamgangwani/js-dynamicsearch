@@ -91,7 +91,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 row_element.style.background = result.value;
                 let in_field = document.querySelector("input[name='color']");
                 row_element.firstChild.remove();
-                row_element.addEventListener('click', () => in_field.value = result['color']);
+                row_element.addEventListener('click', () => {
+                    in_field.value = result['color'];
+                    refreshResult();
+                });
                 row_element.addEventListener('mouseover', () =>  row_element.style.opacity = 0.8);
                 row_element.addEventListener('mouseout', () => row_element.style.opacity = 1);
                 row_element.querySelector("div:last-child").style.color = "rgba(0,0,0,0)";
@@ -175,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.querySelector("#search_results").classList.toggle("autosuggest_box");
         }
 
-        search.renderSearchResults(search.filterExistingResult(search.resultCache));
+        refreshResult();
     }
 
     document.querySelectorAll(".switch_style").forEach( (el) => {
@@ -188,4 +191,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("input[name='color']").addEventListener("focusout", () => {
         if(CURRENT_STYLE === "autosuggest") setTimeout( () => document.querySelector(".autosuggest_box").style.display = 'none', 50);
     });
+
+    function refreshResult() {
+        search.renderSearchResults(search.filterExistingResult(search.resultCache));
+    }
 });
