@@ -170,14 +170,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 tbl.replaceWith(new_search_container);
                 search.resultContainer = new_search_container;
             }
-        }
-        if(new_style === "autosuggest") {
-            document.querySelector("#search_results").classList.remove("p-5");
-            document.querySelector("#search_results").classList.add("autosuggest_box");
-        }
-        else {
-            document.querySelector("#search_results").classList.remove("autosuggest_box");
-            document.querySelector("#search_results").classList.add("p-5");
+
+            let search_res_box = document.querySelector("#search_results");
+            if(new_style === "autosuggest") {
+                search_res_box.classList.remove("p-5");
+                search_res_box.classList.add("autosuggest_box");
+            }
+            else {
+                search_res_box.classList.remove("autosuggest_box");
+                search_res_box.classList.add("p-5");
+                search_res_box.style.display = 'block';
+            }
         }
         CURRENT_STYLE = new_style;
         refreshResult();
