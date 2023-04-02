@@ -175,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if(new_style === "autosuggest") {
                 search_res_box.classList.remove("p-5");
                 search_res_box.classList.add("autosuggest_box");
+                search_res_box.style.display = 'none';
             }
             else {
                 search_res_box.classList.remove("autosuggest_box");
