@@ -95,8 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     in_field.value = result['color'];
                     refreshResult();
                 });
-                row_element.addEventListener('mouseover', () =>  row_element.style.opacity = 0.8);
-                row_element.addEventListener('mouseout', () => row_element.style.opacity = 1);
+                row_element.addEventListener('mouseover', () =>  row_element.id = "color-selected");
+                row_element.addEventListener('mouseout', () => row_element.id="");
                 row_element.querySelector("div:last-child").style.color = "rgba(0,0,0,0)";
                 return row_element;
             }
@@ -174,6 +174,10 @@ document.addEventListener("DOMContentLoaded", () => {
             document.querySelector("#search_results").classList.remove("p-5");
             document.querySelector("#search_results").classList.add("autosuggest_box");
         }
+        else {
+            document.querySelector("#search_results").classList.remove("autosuggest_box");
+            document.querySelector("#search_results").classList.add("p-5");
+        }
         CURRENT_STYLE = new_style;
         refreshResult();
     }
@@ -186,10 +190,54 @@ document.addEventListener("DOMContentLoaded", () => {
         if(CURRENT_STYLE === "autosuggest") document.querySelector(".autosuggest_box").style.display = 'block';
     });
     document.querySelector("input[name='color']").addEventListener("focusout", () => {
-        if(CURRENT_STYLE === "autosuggest") setTimeout( () => document.querySelector(".autosuggest_box").style.display = 'none', 50);
+        if(CURRENT_STYLE === "autosuggest") setTimeout( () => document.querySelector(".autosuggest_box").style.display = 'none', 1);
     });
 
     function refreshResult() {
         search.renderSearchResults(search.filterExistingResult(search.resultCache));
     }
+
+    document.addEventListener("keydown", (e) => {
+        let search_results = document.querySelector("#search_results");
+        if(CURRENT_STYLE !== "autosuggest") return;
+        if(!search_results.checkVisibility()) return;
+        if(e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") return;
+        let curr_selected = document.querySelector("#color-selected");
+
+        // Nothing is selected
+        if(!curr_selected) {
+            if(e.key === "ArrowDown") search_results.firstChild.id = "color-selected";
+            else if(e.key === "ArrowUp") search_results.lastChild.id = "color-selected";
+        }
+        else {
+            let current_selection = document.querySelector("#color-selected");
+            // Edge cases: arrow up on first element & arrow down on last element
+
+            if(e.key === "ArrowUp") {
+                let final_selection = null;
+                let prev_sibling = current_selection.previousSibling;
+                if(!prev_sibling) final_selection = search_results.lastChild;
+                else final_selection = prev_sibling;
+                current_selection.id = "";
+                final_selection.id = "color-selected";
+            }
+
+            else if(e.key === "ArrowDown") {
+                let final_selection = null;
+                let next_sibling = current_selection.nextSibling;
+                if(!next_sibling) final_selection = search_results.firstChild;
+                else final_selection = next_sibling;
+                current_selection.id = "";
+                final_selection.id = "color-selected";
+            }
+
+            else if(e.key === "Enter") {
+                if(current_selection) {
+                    current_selection.click();
+                    document.querySelector("input[name='color']").blur();
+                }
+            }
+        }
+        console.log(e.key);
+    });
 });

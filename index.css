@@ -19,3 +19,7 @@
     padding: 5px 0px;
     text-transform: uppercase;
 }
+
+#color-selected{
+    opacity: 0.8;
+}
