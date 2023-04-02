@@ -95,6 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     in_field.value = result['color'];
                     refreshResult();
                 });
+                row_element.setAttribute("search-value", result['color']);
                 row_element.addEventListener('mouseover', () =>  row_element.id = "color-selected");
                 row_element.addEventListener('mouseout', () => row_element.id="");
                 row_element.querySelector("div:last-child").style.color = "rgba(0,0,0,0)";
@@ -197,6 +198,16 @@ document.addEventListener("DOMContentLoaded", () => {
         search.renderSearchResults(search.filterExistingResult(search.resultCache));
     }
 
+    function SelectSearchRow(row_element) { 
+        let curr_selection = document.querySelector("#color-selected");
+        if(curr_selection) curr_selection.id = "";
+        row_element.id = "color-selected";
+        let in_field = document.querySelector("input[name='color']");
+        in_field.value = "";
+        in_field.value = row_element.getAttribute("search-value");
+        in_field.focus();
+    }
+
     document.addEventListener("keydown", (e) => {
         let search_results = document.querySelector("#search_results");
         if(CURRENT_STYLE !== "autosuggest") return;
@@ -206,38 +217,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Nothing is selected
         if(!curr_selected) {
-            if(e.key === "ArrowDown") search_results.firstChild.id = "color-selected";
-            else if(e.key === "ArrowUp") search_results.lastChild.id = "color-selected";
+            if(e.key === "ArrowDown") SelectSearchRow(search_results.firstChild);
+            else if(e.key === "ArrowUp") SelectSearchRow(search_results.lastChild);
         }
+
+        // Something is selected
         else {
             let current_selection = document.querySelector("#color-selected");
+            let final_selection = null;
             // Edge cases: arrow up on first element & arrow down on last element
 
             if(e.key === "ArrowUp") {
-                let final_selection = null;
                 let prev_sibling = current_selection.previousSibling;
                 if(!prev_sibling) final_selection = search_results.lastChild;
                 else final_selection = prev_sibling;
-                current_selection.id = "";
-                final_selection.id = "color-selected";
             }
 
             else if(e.key === "ArrowDown") {
-                let final_selection = null;
                 let next_sibling = current_selection.nextSibling;
                 if(!next_sibling) final_selection = search_results.firstChild;
                 else final_selection = next_sibling;
-                current_selection.id = "";
-                final_selection.id = "color-selected";
             }
 
-            else if(e.key === "Enter") {
+            if(final_selection) SelectSearchRow(final_selection);
+
+            if(e.key === "Enter") {
                 if(current_selection) {
                     current_selection.click();
                     document.querySelector("input[name='color']").blur();
                 }
             }
         }
-        console.log(e.key);
+        e.preventDefault();
     });
 });
