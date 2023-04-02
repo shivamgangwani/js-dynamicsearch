@@ -126,7 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function switchStyle(new_style) {
         if(new_style == CURRENT_STYLE) return;
-        CURRENT_STYLE = new_style;
         search.row_container = styles[new_style]['row_container'];
         console.log("new row container", search.row_container);
         search.field_container = styles[new_style]['field_container'];
@@ -134,7 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if('field_handlers' in styles[new_style]) {
             Object.entries(styles[new_style]['field_handlers']).forEach( ([field, handler]) => search.setDisplayFieldHandler(field, handler));
         }
-
         if(new_style === 'table') {
             let table = document.createElement("table");
             table.classList.add('table');
@@ -172,12 +170,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 search.resultContainer = new_search_container;
             }
         }
-
-        if(CURRENT_STYLE === "autosuggest" || new_style === "autosuggest") {
-            document.querySelector("#search_results").classList.toggle("p-5");
-            document.querySelector("#search_results").classList.toggle("autosuggest_box");
+        if(new_style === "autosuggest") {
+            document.querySelector("#search_results").classList.remove("p-5");
+            document.querySelector("#search_results").classList.add("autosuggest_box");
         }
-
+        CURRENT_STYLE = new_style;
         refreshResult();
     }
 
