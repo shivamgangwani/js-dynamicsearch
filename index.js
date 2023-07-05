@@ -73,6 +73,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 'value' : (i, value) => noKeyOnlyValue("", value),
             },
             "item_handler" : (row_element, result) => row_element
+        },
+        "autosuggest" : {
+            "row_container" : {
+                "element" : "div",
+                "classes" : ["row"]
+            },
+            "field_container" : {
+                "element" : "div",
+                "classes" : ["col"]
+            },
+            "field_handlers" : {
+                "color" : (i, color) => noKeyOnlyValue("", color),
+                "value" : (i, value) => noKeyOnlyValue("", value),
+            },
+            "item_handler" : (row_element, result) => {
+                row_element.style.background = result.value;
+                let in_field = document.querySelector("input[name='color']");
+                row_element.firstChild.remove();
+                row_element.addEventListener('click', () => {
+                    in_field.value = result['color'];
+                    refreshResult();
+                });
+                row_element.setAttribute("search-value", result['color']);
+                row_element.addEventListener('mouseover', () =>  row_element.id = "color-selected");
+                row_element.addEventListener('mouseout', () => row_element.id="");
+                row_element.querySelector("div:last-child").style.color = "rgba(0,0,0,0)";
+                return row_element;
+            }
         }
     }
 
@@ -84,7 +112,9 @@ document.addEventListener("DOMContentLoaded", () => {
         "field_container" : styles[DEFAULT_STYLE]['field_container']
     });
 
-    search.maxItems = 50;
+
+
+    search.maxItems = 10;
 
     search.itemHandler = styles[DEFAULT_STYLE]['item_handler'];
 
@@ -97,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function switchStyle(new_style) {
         if(new_style == CURRENT_STYLE) return;
-        CURRENT_STYLE = new_style;
         search.row_container = styles[new_style]['row_container'];
         console.log("new row container", search.row_container);
         search.field_container = styles[new_style]['field_container'];
@@ -105,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if('field_handlers' in styles[new_style]) {
             Object.entries(styles[new_style]['field_handlers']).forEach( ([field, handler]) => search.setDisplayFieldHandler(field, handler));
         }
-
         if(new_style === 'table') {
             let table = document.createElement("table");
             table.classList.add('table');
@@ -142,11 +170,88 @@ document.addEventListener("DOMContentLoaded", () => {
                 tbl.replaceWith(new_search_container);
                 search.resultContainer = new_search_container;
             }
+
+            let search_res_box = document.querySelector("#search_results");
+            if(new_style === "autosuggest") {
+                search_res_box.classList.remove("p-5");
+                search_res_box.classList.add("autosuggest_box");
+                search_res_box.style.display = 'none';
+            }
+            else {
+                search_res_box.classList.remove("autosuggest_box");
+                search_res_box.classList.add("p-5");
+                search_res_box.style.display = 'block';
+            }
         }
-        search.renderSearchResults(search.filterExistingResult(search.resultCache));
+        CURRENT_STYLE = new_style;
+        refreshResult();
     }
 
     document.querySelectorAll(".switch_style").forEach( (el) => {
         el.addEventListener('click', () => switchStyle(el.getAttribute("target_style")));
+    });
+
+    document.querySelector("input[name='color']").addEventListener("focusin", () => {
+        if(CURRENT_STYLE === "autosuggest") document.querySelector(".autosuggest_box").style.display = 'block';
+    });
+    document.querySelector("input[name='color']").addEventListener("focusout", () => {
+        if(CURRENT_STYLE === "autosuggest") setTimeout( () => document.querySelector(".autosuggest_box").style.display = 'none', 1);
+    });
+
+    function refreshResult() {
+        search.renderSearchResults(search.filterExistingResult(search.resultCache));
+    }
+
+    function SelectSearchRow(row_element) { 
+        let curr_selection = document.querySelector("#color-selected");
+        if(curr_selection) curr_selection.id = "";
+        row_element.id = "color-selected";
+        let in_field = document.querySelector("input[name='color']");
+        in_field.value = "";
+        in_field.value = row_element.getAttribute("search-value");
+        in_field.focus();
+    }
+
+    document.addEventListener("keydown", (e) => {
+        let search_results = document.querySelector("#search_results");
+        if(CURRENT_STYLE !== "autosuggest") return;
+        if(!search_results.checkVisibility()) return;
+        if(e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") return;
+        let curr_selected = document.querySelector("#color-selected");
+
+        // Nothing is selected
+        if(!curr_selected) {
+            if(e.key === "ArrowDown") SelectSearchRow(search_results.firstChild);
+            else if(e.key === "ArrowUp") SelectSearchRow(search_results.lastChild);
+        }
+
+        // Something is selected
+        else {
+            let current_selection = document.querySelector("#color-selected");
+            let final_selection = null;
+            // Edge cases: arrow up on first element & arrow down on last element
+
+            if(e.key === "ArrowUp") {
+                let prev_sibling = current_selection.previousSibling;
+                if(!prev_sibling) final_selection = search_results.lastChild;
+                else final_selection = prev_sibling;
+            }
+
+            else if(e.key === "ArrowDown") {
+                let next_sibling = current_selection.nextSibling;
+                if(!next_sibling) final_selection = search_results.firstChild;
+                else final_selection = next_sibling;
+            }
+
+            if(final_selection) SelectSearchRow(final_selection);
+
+            if(e.key === "Enter") {
+                if(current_selection) {
+                    current_selection.click();
+                    document.querySelector("input[name='color']").blur();
+                }
+            }
+        }
+        e.preventDefault();
     });
 });

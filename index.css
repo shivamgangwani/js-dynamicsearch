@@ -1,0 +1,25 @@
+.autosuggest_box {
+    overflow-y: hidden;
+    border: 1px solid grey;
+    text-align: center;
+    padding: 0;
+    margin : 0;
+}
+
+.autosuggest_box > div {
+    padding: 0;
+    margin: 0;
+}
+
+.autosuggest_box {
+    display: none;
+}
+
+.autosuggest_box > div.row {
+    padding: 5px 0px;
+    text-transform: uppercase;
+}
+
+#color-selected{
+    opacity: 0.8;
+}
