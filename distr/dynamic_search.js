@@ -179,30 +179,39 @@ class DynamicSearch {
     }
     
     async fetchResult() {
-        // If auto_fetch is disabled, then just filter the existing fields on the parameters given
-        if(!this.auto_fetch) return this.filterExistingResult();
-
-        // If auto_fetch is enabled, then ping the API for new information
-        const search_params = this.getQueryValueMap();
-        Object.entries(this.request_params).forEach(([q_arg,value]) => search_params[q_arg] = value);
-            
-        let tmpURL = this.search_URL + '?' + new URLSearchParams(search_params);
         let result = '';
-        await fetch(tmpURL, {
-            method : 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-type': 'application/json; charset=UTF-8',
-                'X-CSRFToken' : this.csrf_token
-            }
-        }).then(
-            (response) => (response.ok ? response.json() : Promise.reject(response) )
-        ).then(
-            (data) => (result = data)
-        ).catch(
-            (error) => alert(`An error occured: ${error}! Please contact the developer`)
-        )
-        this.LATEST_SEARCH_RESULT = result;
+
+        // If auto_fetch is disabled, then just return the existing result cache as is
+        if(!this.auto_fetch) result = this.LATEST_SEARCH_RESULT;
+
+        // If auto_fetch is enabled, then ping the API for new information & store it in the cache
+        else {
+            const search_params = this.getQueryValueMap();
+            Object.entries(this.request_params).forEach(([q_arg,value]) => search_params[q_arg] = value);
+                
+            let tmpURL = this.search_URL + '?' + new URLSearchParams(search_params);
+            await fetch(tmpURL, {
+                method : 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                    'X-CSRFToken' : this.csrf_token
+                }
+            }).then(
+                (response) => (response.ok ? response.json() : Promise.reject(response) )
+            ).then(
+                (data) => (result = data)
+            ).catch(
+                (error) => alert(`An error occured: ${error}! Please contact the developer`)
+            )
+            this.LATEST_SEARCH_RESULT = result;
+        }
+
+        // Filter the existing fields on the parameters given
+        // Note that if autofetch = True, the API will typically returned a filtered response anyway
+        // But if autofetch = False, the search_URL may be hitting a static JSON file so filtering would have to be front-end
+        // In either case, without assuming the specifics of the implementation, call filterExistingResult on the result we have now
+        result = this.filterExistingResult(result);
         return result;
     }
                     
