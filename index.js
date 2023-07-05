@@ -123,12 +123,12 @@ document.addEventListener("DOMContentLoaded", () => {
         search.renderSearchResults(result);
         search.autoFetch = false;
         document.querySelector("#col_num").textContent = `${result.length} colors`;
+        return result;
     });
 
     function switchStyle(new_style) {
         if(new_style == CURRENT_STYLE) return;
         search.row_container = styles[new_style]['row_container'];
-        console.log("new row container", search.row_container);
         search.field_container = styles[new_style]['field_container'];
         search.itemHandler = styles[new_style]['item_handler'];
         if('field_handlers' in styles[new_style]) {
