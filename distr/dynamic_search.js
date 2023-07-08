@@ -1,3 +1,14 @@
+// Taken from: https://blog.bitsrc.io/what-is-debounce-in-javascript-a2b8e6157a5a
+function debounce(func, timeout = 300){
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { 
+            func.apply(this, args); 
+        }, timeout);
+    };
+}
+
 class DynamicSearch {
     // Note: Some methods have been defined with arrow functions rather than the typical JS style 
     // Here's why: https://stackoverflow.com/questions/36438774/unexpected-value-of-this-in-typescript
@@ -47,12 +58,11 @@ class DynamicSearch {
         this.item_handler = null;
         
         // Variables to store the state of the dynamic search
-        this.UPDATE_REQUESTED = false;
         this.LAST_UPDATE = {}; // Stores the parameters with which the last query was made
         this.LATEST_SEARCH_RESULT = [];
         Object.entries(this.query_input_elements_map).forEach(([query_param, input_element]) => {
             this.LAST_UPDATE[query_param] = "";
-            input_element.addEventListener('input', this.requestUpdate);
+            input_element.addEventListener("input", debounce(() => this.updateResults(), 200));
         });
     }
     
@@ -126,12 +136,6 @@ class DynamicSearch {
         const tmp_map = {};
         Object.entries(this.query_input_elements_map).forEach(([q_arg, field]) => tmp_map[q_arg] = field.value);
         return tmp_map;
-    }
-
-    requestUpdate = () => {
-        if(this.UPDATE_REQUESTED) return;
-        this.UPDATE_REQUESTED = true;
-        setTimeout(this.updateResults, 250);
     }
     
     filterExistingResult = () => {
@@ -207,7 +211,6 @@ class DynamicSearch {
     }
                     
     updateResults = () => {
-        this.UPDATE_REQUESTED = false;
         this.fetchResult().then((result) => {
             // If auto_fetch is on, then result contains info retrieve from API and we ought to save it
             if(this.auto_fetch) this.LATEST_SEARCH_RESULT = result;
