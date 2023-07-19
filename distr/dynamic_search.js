@@ -227,7 +227,7 @@ class DynamicSearch {
         result.every( (result) => {
             this.result_container.appendChild(this.createRow(result));
             result_count += 1;
-            if(result_count > this.max_items) return false;
+            if(result_count >= this.max_items) return false;
             return true;
         });
         if(result_count === 0) {
