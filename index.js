@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const DEFAULT_STYLE = 'simple';
-    let CURRENT_STYLE = DEFAULT_STYLE;
+    let CURRENT_STYLE = 'none';
 
     function createKeyValueSpan(key, value) {
         let sp = document.createElement("span");
@@ -91,14 +91,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 row_element.style.background = result.value;
                 let in_field = document.querySelector("input[name='color']");
                 row_element.firstChild.remove();
-                row_element.addEventListener('click', () => {
-                    in_field.value = result['color'];
-                    refreshResult();
-                });
                 row_element.setAttribute("search-value", result['color']);
                 row_element.addEventListener('mouseover', () =>  row_element.id = "color-selected");
                 row_element.addEventListener('mouseout', () => row_element.id="");
                 row_element.querySelector("div:last-child").style.color = "rgba(0,0,0,0)";
+
+                row_element.addEventListener('mousedown', () => {
+                    in_field.value = result['color'];
+                    refreshResult();
+                });
                 return row_element;
             }
         }
@@ -116,15 +117,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     search.maxItems = 10;
 
-    search.itemHandler = styles[DEFAULT_STYLE]['item_handler'];
-
-    // Fetch once only
-    search.resultCache = search.fetchResult().then( (result) => {
-        search.renderSearchResults(result);
-        search.autoFetch = false;
-        document.querySelector("#col_num").textContent = `${result.length} colors`;
-        return result;
-    });
+    switchStyle(DEFAULT_STYLE);
+    search.ready();
+    search.autoFetch = false;
 
     function switchStyle(new_style) {
         if(new_style == CURRENT_STYLE) return;
@@ -195,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if(CURRENT_STYLE === "autosuggest") document.querySelector(".autosuggest_box").style.display = 'block';
     });
     document.querySelector("input[name='color']").addEventListener("focusout", () => {
-        if(CURRENT_STYLE === "autosuggest") setTimeout( () => document.querySelector(".autosuggest_box").style.display = 'none', 1);
+        if(CURRENT_STYLE === "autosuggest") document.querySelector(".autosuggest_box").style.display = 'none';
     });
 
     function refreshResult() {
@@ -249,6 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if(current_selection) {
                     current_selection.click();
                     document.querySelector("input[name='color']").blur();
+                    refreshResult();
                 }
             }
         }
