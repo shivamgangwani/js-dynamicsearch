@@ -90,6 +90,14 @@ class DynamicSearch {
         return this.LATEST_SEARCH_RESULT;
     }
 
+    get QueryInputElementMap() {
+        return this.query_input_elements_map;
+    }
+
+    set QueryInputElementMap(new_map) {
+        this.query_input_elements_map = new_map;
+    }
+
     // Run this after complete configuration has been done
     ready = () => this.updateResults();
 
